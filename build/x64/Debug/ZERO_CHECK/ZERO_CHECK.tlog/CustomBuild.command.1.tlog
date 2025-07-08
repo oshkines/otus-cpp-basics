@@ -1,0 +1,10 @@
+^D:\SOFT\_C++ COURSE\BASIC\GITLESSONS\BUILD\CMAKEFILES\577DB76727F23EE0C550B3F71F15E381\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SD:/Soft/_C++ Course/Basic/GitLessons" "-BD:/Soft/_C++ Course/Basic/GitLessons/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "D:/Soft/_C++ Course/Basic/GitLessons/build/VigVamProject.sln"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

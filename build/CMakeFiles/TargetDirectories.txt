@@ -1,0 +1,3 @@
+D:/Soft/_C++ Course/Basic/GitLessons/build/CMakeFiles/SayVigVam.dir
+D:/Soft/_C++ Course/Basic/GitLessons/build/CMakeFiles/ALL_BUILD.dir
+D:/Soft/_C++ Course/Basic/GitLessons/build/CMakeFiles/ZERO_CHECK.dir
