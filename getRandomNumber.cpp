@@ -11,7 +11,8 @@ int getRandomNumber() {
 
 	const int random_value = std::rand() % 100;
 
-	std::cout << random_value << std::endl;
+	//std::cout << random_value << std::endl;
+    //std::cout << 32767 % 100 << std::endl;
 
 	return random_value;
 }

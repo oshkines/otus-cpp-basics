@@ -7,10 +7,6 @@ int SaveFile(std::string user_name, int attempts_count){
 using namespace std;
 const std::string high_scores_filename = "high_scores.txt";
 
-	// Ask about name
-	std::cout << "Hi! Enter your name, please:" << std::endl;
-
-
 	if (std::cin.fail()) {
 		std::cout << "Bad value!" << std::endl;
 		return -1;
