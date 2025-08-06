@@ -1,44 +1,28 @@
+#include "World.hpp"
+#include "black_box/Application.hpp"
 #include <iostream>
-#include <string>
-#include "getRandomNumber.hpp"
-#include "SaveFile.hpp"
 
-int main(){
-    using namespace std; 
+int main(int argc, char* argv[]) {
 
-    string user_name;
-    int TempValue = 0;
-    TempValue = getRandomNumber();
-    cout << TempValue << endl;
-    const int getRandomNumber = TempValue; 
-    //delete TempValue;
-	int current_value = 0;
-	bool not_win = true;
-    int attempts_count = 0;
-
- 
-    cout << "Hi! Enter your name, please:" << endl;
-    cin >> user_name;
-
-    cout << "Enter your high score:" << endl;
-
-	do {
-
-        attempts_count = attempts_count++;
-        cin >> current_value;
-
-		if (current_value < getRandomNumber) {
-			cout << "less than " << current_value << endl;
-		}
-		else if (current_value > getRandomNumber) {
-			cout << "greater than " << current_value << endl;
-		}
-		else {
-			cout << "you win!" << endl;
-			break;
-		}
-
-	} while(true);
-
-	return SaveFile(user_name, attempts_count);
+    if (argc < 2) {
+        std::cerr << "Please, call with one argument "
+                  << "( example: " << argv[0] << " <path to file smile.txt> )";
+        return 1;
+    }
+    try {
+        World w(argv[1]);
+        /**
+         * Код ниже запускает выполнение приложения. Для
+         * выполнения задания нет необходимости изучать
+         * или менять содержимое Application. Для начала
+         * лучше сфокусироваться на Ball.hpp, Ball.cpp и
+         * World.cpp
+         */
+        Application app("physics");
+        app.run(w);
+    } catch (std::exception& ex) {
+        std::cerr << ex.what() << std::endl;
+        return 2;
+    }
+    return 0;
 }
