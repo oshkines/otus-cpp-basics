@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "Ball.hpp"
+#define M_PI 3.1415926535
 
 
 /* easy ctor */
