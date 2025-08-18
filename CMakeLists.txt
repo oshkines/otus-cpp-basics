@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.7.2)
 project(physics)
 
 set(CMAKE_CXX_STANDARD 17)
 
 # Пытаемся найти предустановленный SFML
-find_package(SFML COMPONENTS graphics)
+find_package(SFML QUIET COMPONENTS graphics)
 
 if (SFML_FOUND)
     message(STATUS "The SFML installed in the system will be used")
@@ -12,11 +12,8 @@ else ()
     # Если SFML не найден - выкачиваем и собираем из исходников
     message(STATUS "Get SFML from the source code")
     include(FetchContent)
-    #FetchContent_Declare(SFML
-    #        GIT_REPOSITORY https://github.com/SFML/SFML.git
-    #        GIT_TAG 3.0.x)
     FetchContent_Declare(SFML
-            GIT_REPOSITORY D:\Soft\_C++ Course\SFML 3.0.1 source code\SFML-SFML-016bea9
+            GIT_REPOSITORY https://github.com/SFML/SFML.git
             GIT_TAG 2.6.x)
     set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
     set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
