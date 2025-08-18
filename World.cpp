@@ -1,6 +1,10 @@
-#include "World.hpp"
-#include "Painter.hpp"
+
 #include <fstream>
+#include <iostream>
+
+#include "Ball.hpp"
+#include "Painter.hpp"
+#include "World.hpp"
 
 // Длительность одного тика симуляции.
 // Подробнее см. update()
@@ -23,52 +27,34 @@ World::World(const std::string& worldFilePath) {
      * многократно - хорошо бы вынести это в функцию
      * и не дублировать код...
      */
-    stream >> topLeft.x >> topLeft.y >> bottomRight.x >> bottomRight.y;
+    // stream >> topLeft.x >> topLeft.y >> bottomRight.x >> bottomRight.y;
+    Point topLeft{0.0, 0.0};
+    Point bottomRight{0.0, 0.0};
+    stream >> topLeft >> bottomRight;
+    this->topLeft = topLeft;
+    this->bottomRight = bottomRight;
     physics.setWorldBox(topLeft, bottomRight);
 
-    /**
-     * TODO: хорошее место для улучшения.
-     * (x, y) и (vx, vy) - составные части объекта, также
-     * как и (red, green, blue). Опять же, можно упростить
-     * этот код, научившись читать сразу Point, Color...
-     */
-    double x;
-    double y;
-    double vx;
-    double vy;
-    double radius;
-
-    double red;
-    double green;
-    double blue;
-
-    bool isCollidable;
-
-    // Здесь не хватает обработки ошибок, но на текущем
-    // уровне прохождения курса нас это устраивает
-    while (stream.peek(), stream.good()) {
-        // Читаем координаты центра шара (x, y) и вектор
-        // его скорости (vx, vy)
-        stream >> x >> y >> vx >> vy;
-        // Читаем три составляющие цвета шара
-        stream >> red >> green >> blue;
-        // Читаем радиус шара
-        stream >> radius;
-        // Читаем свойство шара isCollidable, которое
-        // указывает, требуется ли обрабатывать пересечение
-        // шаров как столкновение. Если true - требуется.
-        // В базовой части задания этот параметр
-        stream >> std::boolalpha >> isCollidable;
-
-        // TODO: место для доработки.
-        // Здесь не хватает самого главного - создания
-        // объекта класса Ball со свойствами, прочитанными
-        // выше, и его помещения в контейнер balls
-
-        // После того как мы каким-то образом
-        // сконструируем объект Ball ball;
-        // добавьте его в конец контейнера вызовом
-        // balls.push_back(ball);
+    while(stream >> std::ws && stream.eof() == false)
+    {
+        Ball ball;
+        if(stream >> ball)
+        {
+            balls.push_back(ball);
+        }
+        else if(stream.eof() == true)
+        {
+            /* Ok, we've just reached the end of file */
+            break;
+        }
+        else
+        {
+            std::cerr << "Error: failed to completely parse input stream in function: " << __func__ << std::endl;
+            stream.clear();
+            stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            /* Better to raise an exception but we won't do it here */
+            return;
+        }
     }
 }
 

@@ -1,12 +1,31 @@
-#include "Ball.hpp"
 #include <cmath>
+#include <iostream>
+
+#include "Ball.hpp"
+
+
+/* easy ctor */
+Ball::Ball() :
+            m_center(Point{0.0, 0.0}), m_velocity(Velocity{0.0, 0.0}), m_color(Color{0.0, 0.0, 0.0}),
+            m_radius{0.0}, m_isCollidable{false}
+{
+
+}
+
+/* complete ctor */
+Ball::Ball(Point& center, Velocity& velocity, Color& color, double radius, const bool isCollidable) :
+                m_center(center), m_velocity(velocity), m_color(color), m_radius(radius), m_isCollidable(isCollidable)
+{
+
+}
+
 
 /**
  * Задает скорость объекта
  * @param velocity новое значение скорости
  */
 void Ball::setVelocity(const Velocity& velocity) {
-    // TODO: место для доработки
+    this->m_velocity = velocity;
 }
 
 /**
@@ -14,7 +33,12 @@ void Ball::setVelocity(const Velocity& velocity) {
  */
 Velocity Ball::getVelocity() const {
     // TODO: место для доработки
-    return {};
+    return this->m_velocity;
+}
+
+bool Ball::getIsCollidable() const
+{
+    return this->m_isCollidable;
 }
 
 /**
@@ -27,6 +51,7 @@ Velocity Ball::getVelocity() const {
  */
 void Ball::draw(Painter& painter) const {
     // TODO: место для доработки
+    painter.draw(m_center, m_radius, m_color);
 }
 
 /**
@@ -35,6 +60,7 @@ void Ball::draw(Painter& painter) const {
  */
 void Ball::setCenter(const Point& center) {
     // TODO: место для доработки
+    this->m_center = center;
 }
 
 /**
@@ -42,7 +68,7 @@ void Ball::setCenter(const Point& center) {
  */
 Point Ball::getCenter() const {
     // TODO: место для доработки
-    return {};
+    return this->m_center;
 }
 
 /**
@@ -52,7 +78,7 @@ Point Ball::getCenter() const {
  */
 double Ball::getRadius() const {
     // TODO: место для доработки
-    return {};
+    return this->m_radius;
 }
 
 /**
@@ -64,5 +90,27 @@ double Ball::getRadius() const {
  */
 double Ball::getMass() const {
     // TODO: место для доработки
-    return {};
+    double mass = M_PI * std::pow(this->m_radius, 3) * 4.00 / 3.00;     
+    return mass;
+}
+
+
+std::istream& operator>>(std::istream& stream, Ball& ball)
+{
+    Point center;
+    Velocity velocity;
+    Color color;
+    double radius;
+    bool isCollidable;
+
+    if(stream >> center >> velocity >> color >> radius >> std::boolalpha >> isCollidable)
+    {
+        ball = Ball(center, velocity, color, radius, isCollidable);
+    }
+    else
+    {
+        stream.setstate(std::ios::failbit);
+    }
+
+    return stream;
 }

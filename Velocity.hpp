@@ -1,6 +1,9 @@
 #pragma once
-#include "Point.hpp"
+
 #include <cmath>
+#include <istream>
+
+#include "Point.hpp"
 
 class Velocity {
   public:
@@ -23,6 +26,14 @@ class Velocity {
 
     inline Point vector() const {
         return vec;
+    }
+
+    friend std::istream& operator>>(std::istream& is, Velocity& velocity)
+    {
+        Point velocityVector{0.0, 0.0};
+        is >> velocityVector.x >> velocityVector.y;
+        velocity.setVector(velocityVector);
+        return is;
     }
 
   private:

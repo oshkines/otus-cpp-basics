@@ -1,1 +1,6 @@
-/build/
+**/.idea/
+**/.settings/
+**/.vscode/
+**/build/
+**/debug/
+**/release/
