@@ -12,8 +12,11 @@ else ()
     # Если SFML не найден - выкачиваем и собираем из исходников
     message(STATUS "Get SFML from the source code")
     include(FetchContent)
+    #FetchContent_Declare(SFML
+    #        GIT_REPOSITORY https://github.com/SFML/SFML.git
+    #        GIT_TAG 3.0.x)
     FetchContent_Declare(SFML
-            GIT_REPOSITORY https://github.com/SFML/SFML.git
+            GIT_REPOSITORY D:\Soft\_C++ Course\SFML 3.0.1 source code\SFML-SFML-016bea9
             GIT_TAG 2.6.x)
     set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
     set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
