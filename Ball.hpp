@@ -14,6 +14,7 @@ private:
     Color m_color;
     double m_radius{0.};
     bool m_isCollidable{false};
+    double mass{0.};
 public:
     Ball();
     Ball(const Point& center, const Velocity& velocity, const Color& color, const double radius, const bool isCollidable);

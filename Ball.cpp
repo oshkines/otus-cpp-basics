@@ -18,7 +18,7 @@ Ball::Ball() = default;
 Ball::Ball(const Point& center, const Velocity& velocity, const Color& color, const double radius, const bool isCollidable) :
                 m_center(center), m_velocity(velocity), m_color(color), m_radius(radius), m_isCollidable(isCollidable)
 {
-
+  mass = M_PI * std::pow(this->m_radius, 3) * 4.00 / 3.00;
 }
 
 
@@ -86,7 +86,7 @@ double Ball::getRadius() const {
  * эквивалентна объему: PI * radius^3 * 4. / 3.
  */
 double Ball::getMass() const {
-    double mass = M_PI * std::pow(this->m_radius, 3) * 4.00 / 3.00;     
+    //double mass = M_PI * std::pow(this->m_radius, 3) * 4.00 / 3.00;     
     return mass;
 }
 
