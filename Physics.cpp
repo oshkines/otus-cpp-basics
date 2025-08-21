@@ -31,7 +31,7 @@ void Physics::collideBalls(std::vector<Ball>& balls) const {
 
             const bool isCollidableA = a->getIsCollidable();
             const bool isCollidableB = b->getIsCollidable();
-            if(isCollidableA == true && isCollidableB == true && distanceBetweenCenters2 < collisionDistance2)
+            if(isCollidableA && isCollidableB && distanceBetweenCenters2 < collisionDistance2)
             // if(distanceBetweenCenters2 < collisionDistance2)
             {
                 processCollision(*a, *b, distanceBetweenCenters2);
@@ -42,7 +42,7 @@ void Physics::collideBalls(std::vector<Ball>& balls) const {
 
 void Physics::collideWithBox(std::vector<Ball>& balls) const {
     for (Ball& ball : balls) {
-        if(ball.getIsCollidable() == false)
+        if(!ball.getIsCollidable())
         {
             continue;
         }

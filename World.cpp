@@ -35,14 +35,14 @@ World::World(const std::string& worldFilePath) {
     this->bottomRight = bottomRight;
     physics.setWorldBox(topLeft, bottomRight);
 
-    while(stream >> std::ws && stream.eof() == false)
+    while(stream >> std::ws && !stream.eof())
     {
         Ball ball;
         if(stream >> ball)
         {
             balls.push_back(ball);
         }
-        else if(stream.eof() == true)
+        else if(stream.eof())
         {
             /* Ok, we've just reached the end of file */
             break;

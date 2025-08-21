@@ -1,6 +1,6 @@
 #pragma once
 #include <fstream>
-#include <vector>
+//#include <vector>
 
 #include "Painter.hpp"
 #include "Point.hpp"
@@ -12,11 +12,11 @@ private:
     Point m_center;
     Velocity m_velocity;
     Color m_color;
-    double m_radius;
-    bool m_isCollidable;
+    double m_radius{0.};
+    bool m_isCollidable{false};
 public:
     Ball();
-    Ball(Point& center, Velocity& velocity, Color& color, double radius, const bool isCollidable);
+    Ball(const Point& center, const Velocity& velocity, const Color& color, const double radius, const bool isCollidable);
     // Ball& operator=(const Ball&)=Ball(Point center, Velocity velocity, Color color, double radius, const bool isCollidable);
     ~Ball() = default;
     void setVelocity(const Velocity& velocity);
