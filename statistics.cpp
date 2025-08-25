@@ -15,7 +15,7 @@ public:
 class Min : public IStatistics {
         double m_min;
     public:
-        Min() : m_min{std::numeric_limits<double>::min()} {
+        Min() : m_min{std::numeric_limits<double>::max()} {
         }
 
         void update(double next) override {
@@ -36,7 +36,7 @@ class Min : public IStatistics {
 class Max : public IStatistics {
         double m_max;
     public:
-        Max() : m_max{0.0} {
+        Max() : m_max{std::numeric_limits<double>::min()} {
         }
 
         void update(double next) override {
@@ -153,9 +153,12 @@ void SearchForValues(std::vector<double> &results){
 /* 	size_t statistics_count = results.size();
 	IStatistics *statistics = new IStatistics statistics_count; */
 
-	const size_t statistics_count = 1;
+	const size_t statistics_count = 4;
 	IStatistics *statistics[statistics_count];	
 	statistics[0] = new Min{};
+	statistics[1] = new Max{};
+	statistics[2] = new Mean{};
+	statistics[3] = new Std{};
 
 	for (int it = 0; it < results.size(); it++) {
 		for (auto i = 0; i < statistics_count; i++) {
@@ -168,42 +171,42 @@ void SearchForValues(std::vector<double> &results){
 		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
 	}
 
-	statistics[0] = new Max{};
+	// statistics[0] = new Max{};
 
-	for (int it = 0; it < results.size(); it++) {
-		for (auto i = 0; i < statistics_count; i++) {
-			statistics[i]->update(results[it]);
-		}
-	}
+	// for (int it = 0; it < results.size(); it++) {
+	// 	for (auto i = 0; i < statistics_count; i++) {
+	// 		statistics[i]->update(results[it]);
+	// 	}
+	// }
 
-	// Print results if any
-	for (size_t i = 0; i < statistics_count; ++i) {
-		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
-	}
+	// // Print results if any
+	// for (size_t i = 0; i < statistics_count; ++i) {
+	// 	std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
+	// }
 
-	statistics[0] = new Mean{};
+	// statistics[0] = new Mean{};
 
-	for (int it = 0; it < results.size(); it++) {
-		for (auto i = 0; i < statistics_count; i++) {
-			statistics[i]->update(results[it]);
-		}
-	}
+	// for (int it = 0; it < results.size(); it++) {
+	// 	for (auto i = 0; i < statistics_count; i++) {
+	// 		statistics[i]->update(results[it]);
+	// 	}
+	// }
 
-	// Print results if any
-	for (size_t i = 0; i < statistics_count; ++i) {
-		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
-	}
+	// // Print results if any
+	// for (size_t i = 0; i < statistics_count; ++i) {
+	// 	std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
+	// }
 	
-	statistics[0] = new Std{};
+	// statistics[0] = new Std{};
 
-    for (auto i = 0; i < statistics_count; i++) {
-        statistics[i] -> update(results[i]);
-    }
+    // for (auto i = 0; i < statistics_count; i++) {
+    //     statistics[i] -> update(results[i]);
+    // }
 
-	// Print results if any
-	for (size_t i = 0; i < statistics_count; ++i) {
-		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
-	}	
+	// // Print results if any
+	// for (size_t i = 0; i < statistics_count; ++i) {
+	// 	std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
+	// }	
 
 
 	// Clear memory - delete all objects created by new
