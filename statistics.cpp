@@ -36,7 +36,7 @@ class Min : public IStatistics {
 class Max : public IStatistics {
         double m_max;
     public:
-        Max() : m_max{std::numeric_limits<double>::max()} {
+        Max() : m_max{0.0} {
         }
 
         void update(double next) override {
@@ -149,7 +149,7 @@ const char* Std::name() const
 
 
 
-void FindingTheMinimumValue(std::vector<double> &results){
+void SearchForValues(std::vector<double> &results){
 /* 	size_t statistics_count = results.size();
 	IStatistics *statistics = new IStatistics statistics_count; */
 
@@ -168,18 +168,6 @@ void FindingTheMinimumValue(std::vector<double> &results){
 		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
 	}
 
-	// Clear memory - delete all objects created by new
-	for (size_t i = 0; i < statistics_count; ++i) {
-		delete statistics[i];
-	}
-
-}
-
-void FindingTheMaximumValue(std::vector<double> &results){
-/* 	size_t statistics_count = results.size();
-	IStatistics *statistics[statistics_count]; */
-	const size_t statistics_count = 1;
-	IStatistics *statistics[statistics_count];	
 	statistics[0] = new Max{};
 
 	for (int it = 0; it < results.size(); it++) {
@@ -193,18 +181,6 @@ void FindingTheMaximumValue(std::vector<double> &results){
 		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
 	}
 
-	// Clear memory - delete all objects created by new
-	for (size_t i = 0; i < statistics_count; ++i) {
-		delete statistics[i];
-	}
-
-}
-
-void FindingTheMeanValue(std::vector<double> &results){
-	// size_t statistics_count = results.size();
-	// IStatistics *statistics[statistics_count];
-	const size_t statistics_count = 1;
-	IStatistics *statistics[statistics_count];	
 	statistics[0] = new Mean{};
 
 	for (int it = 0; it < results.size(); it++) {
@@ -217,19 +193,7 @@ void FindingTheMeanValue(std::vector<double> &results){
 	for (size_t i = 0; i < statistics_count; ++i) {
 		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
 	}
-
-	// Clear memory - delete all objects created by new
-	for (size_t i = 0; i < statistics_count; ++i) {
-		delete statistics[i];
-	}
-
-}
-
-void FindingTheStdValue(std::vector<double> &results){
-	// size_t statistics_count = results.size();
-	// IStatistics *statistics[statistics_count];
-	const size_t statistics_count = 1;
-	IStatistics *statistics[statistics_count];	
+	
 	statistics[0] = new Std{};
 
     for (auto i = 0; i < statistics_count; i++) {
@@ -239,7 +203,8 @@ void FindingTheStdValue(std::vector<double> &results){
 	// Print results if any
 	for (size_t i = 0; i < statistics_count; ++i) {
 		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
-	}
+	}	
+
 
 	// Clear memory - delete all objects created by new
 	for (size_t i = 0; i < statistics_count; ++i) {
@@ -248,11 +213,85 @@ void FindingTheStdValue(std::vector<double> &results){
 
 }
 
+// void FindingTheMaximumValue(std::vector<double> &results){
+// /* 	size_t statistics_count = results.size();
+// 	IStatistics *statistics[statistics_count]; */
+// 	const size_t statistics_count = 1;
+// 	IStatistics *statistics[statistics_count];	
+// 	statistics[0] = new Max{};
+
+// 	for (int it = 0; it < results.size(); it++) {
+// 		for (auto i = 0; i < statistics_count; i++) {
+// 			statistics[i]->update(results[it]);
+// 		}
+// 	}
+
+// 	// Print results if any
+// 	for (size_t i = 0; i < statistics_count; ++i) {
+// 		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
+// 	}
+
+// 	// Clear memory - delete all objects created by new
+// 	for (size_t i = 0; i < statistics_count; ++i) {
+// 		delete statistics[i];
+// 	}
+
+// }
+
+// void FindingTheMeanValue(std::vector<double> &results){
+// 	// size_t statistics_count = results.size();
+// 	// IStatistics *statistics[statistics_count];
+// 	const size_t statistics_count = 1;
+// 	IStatistics *statistics[statistics_count];	
+// 	statistics[0] = new Mean{};
+
+// 	for (int it = 0; it < results.size(); it++) {
+// 		for (auto i = 0; i < statistics_count; i++) {
+// 			statistics[i]->update(results[it]);
+// 		}
+// 	}
+
+// 	// Print results if any
+// 	for (size_t i = 0; i < statistics_count; ++i) {
+// 		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
+// 	}
+
+// 	// Clear memory - delete all objects created by new
+// 	for (size_t i = 0; i < statistics_count; ++i) {
+// 		delete statistics[i];
+// 	}
+
+// }
+
+// void FindingTheStdValue(std::vector<double> &results){
+// 	// size_t statistics_count = results.size();
+// 	// IStatistics *statistics[statistics_count];
+// 	const size_t statistics_count = 1;
+// 	IStatistics *statistics[statistics_count];	
+// 	statistics[0] = new Std{};
+
+//     for (auto i = 0; i < statistics_count; i++) {
+//         statistics[i] -> update(results[i]);
+//     }
+
+// 	// Print results if any
+// 	for (size_t i = 0; i < statistics_count; ++i) {
+// 		std::cout << statistics[i]->name() << " = " << statistics[i]->eval() << std::endl;
+// 	}
+
+// 	// Clear memory - delete all objects created by new
+// 	for (size_t i = 0; i < statistics_count; ++i) {
+// 		delete statistics[i];
+// 	}
+
+// }
+
 int RanStatistics(std::vector<double> &results) {
-    FindingTheMinimumValue(results);
+	SearchForValues(results);
+/*     FindingTheMinimumValue(results);
     FindingTheMaximumValue(results);
     FindingTheMeanValue(results);
-    FindingTheStdValue(results);
+    FindingTheStdValue(results); */
 
 	return 0;
 }
