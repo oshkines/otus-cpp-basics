@@ -25,9 +25,9 @@
 
 		for (int j = 2; j >= 0; j--)
 		{
-			container.remuveAT(ArrDelete[j] - 1);
+			container.removeAt(ArrDelete[j] - 1);
 		}
-	}
+	} 
 
 	template <typename Container>
 	void addElements(Container& container) {

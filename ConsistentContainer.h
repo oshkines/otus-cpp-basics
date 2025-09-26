@@ -1,24 +1,19 @@
 #pragma once
 
-#ifndef ConsistentContainer_H  
-#define ConsistentContainer_H
-
-using namespace std;
-
 template<typename T>
 class ConsistentContainer
 {
 private:
     int Size;
+     T* Data;   
 public:
-    T* Data;
     ConsistentContainer(/* args */);
     ~ConsistentContainer();
     void push_back(T value);
-    void Clear();
+    void clear();
     //void pop_front();
     int getSize() { return Size; }
-    void remuveAT(int index);
+    void removeAt(int index);
     void insert(T value, int index);
     T& operator [] (const int index);
 };
@@ -33,11 +28,11 @@ ConsistentContainer<T>::ConsistentContainer(/* args */)
 template<typename T>
 ConsistentContainer<T>::~ConsistentContainer()
 {
-    Clear();
+    clear();
 }
 
 template <typename T>
-void ConsistentContainer<T>::Clear()
+void ConsistentContainer<T>::clear()
 {
     delete[] Data;
 }
@@ -56,7 +51,7 @@ void ConsistentContainer<T>::push_back(T value)
 }
 
 template <typename T>
-void ConsistentContainer<T>::remuveAT(int index)
+void ConsistentContainer<T>::removeAt(int index)
 {
     T* new_Data = new T[Size - 1];
     int counter = 0;
@@ -105,5 +100,3 @@ T& ConsistentContainer<T>::operator[](const int index)
 {
     return this->Data[index];
 }
-
-#endif
