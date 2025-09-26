@@ -5,7 +5,7 @@ class ConsistentContainer
 {
 private:
     int Size;
-     T* Data;   
+     T* data;
 public:
     ConsistentContainer(/* args */);
     ~ConsistentContainer();
@@ -22,7 +22,7 @@ template<typename T>
 ConsistentContainer<T>::ConsistentContainer(/* args */)
 {
     Size = 0;
-    Data = new T[0];//T Data[0];
+    data = new T[0];//T data[0];
 }
 
 template<typename T>
@@ -34,7 +34,7 @@ ConsistentContainer<T>::~ConsistentContainer()
 template <typename T>
 void ConsistentContainer<T>::clear()
 {
-    delete[] Data;
+    delete[] data;
 }
 
 template <typename T>
@@ -42,11 +42,11 @@ void ConsistentContainer<T>::push_back(T value)
 {
     T* new_Data = new T[Size + 1];
     for (size_t i = 0; i < Size; ++i) {
-        new_Data[i] = Data[i];
+        new_Data[i] = data[i];
     }
     new_Data[Size] = value;
-    delete[] Data;
-    Data = new_Data;
+    delete[] data;
+    data = new_Data;
     Size++;
 }
 
@@ -62,10 +62,10 @@ void ConsistentContainer<T>::removeAt(int index)
             continue;
         }
 
-        new_Data[i - counter] = Data[i];
+        new_Data[i - counter] = data[i];
     }
-    delete[] Data;
-    Data = new_Data;
+    delete[] data;
+    data = new_Data;
     Size--;
 }
 
@@ -79,24 +79,24 @@ void ConsistentContainer<T>::insert(T value, int index)
         {
             counter++;
             new_Data[i] = value;
-            new_Data[i + counter] = Data[i];
+            new_Data[i + counter] = data[i];
         }
         else if (i < index)
         {
-            new_Data[i] = Data[i];
+            new_Data[i] = data[i];
         }
         else
         {
-            new_Data[i + counter] = Data[i];
+            new_Data[i + counter] = data[i];
         }
     }
-    delete[] Data;
-    Data = new_Data;
+    delete[] data;
+    data = new_Data;
     Size++;
 }
 
 template <typename T>
 T& ConsistentContainer<T>::operator[](const int index)
 {
-    return this->Data[index];
+    return this->data[index];
 }

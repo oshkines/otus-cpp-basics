@@ -10,9 +10,9 @@ private:
     public:
         Node* pNext;
         Node* pPrev;
-        T Data;
-        Node(T Data = T(), Node* pNext = nullptr, Node* pPrev = nullptr) {
-            this->Data = Data;
+        T data;
+        Node(T data = T(), Node* pNext = nullptr, Node* pPrev = nullptr) {
+            this->data = data;
             this->pNext = pNext;
             this->pPrev = pPrev;
         };
@@ -28,7 +28,7 @@ public:
     void removeAt(int index);
     void insert(T value, int index);
     T& operator [] (const int index);
-    void push_front(T Data);
+    void push_front(T data);
 };
 
 template<typename T>
@@ -65,11 +65,11 @@ void listContainer<T>::clear()
 
 
 template <typename T>
-void listContainer<T>::push_back(T Data)
+void listContainer<T>::push_back(T data)
 {
      if (Head == nullptr)
     {
-        Head = new Node<T>(Data);
+        Head = new Node<T>(data);
     }
     else
     {
@@ -78,7 +78,7 @@ void listContainer<T>::push_back(T Data)
         {
             Current = Current->pNext;
         }
-        Current->pNext = new Node<T>(Data, nullptr, Current);
+        Current->pNext = new Node<T>(data, nullptr, Current);
     }
     Size++;
 }
@@ -93,7 +93,7 @@ T& listContainer<T>::operator[](const int index)
     while (Current != nullptr) {
         if (counter == index)
         {
-            return Current->Data;
+            return Current->data;
         }
 
         Current = Current->pNext;
@@ -134,18 +134,18 @@ void listContainer<T>::removeAt(int index)
 
 
 template <typename T>
-void listContainer<T>::push_front(T Data) // добавляет элемент в начало списка
+void listContainer<T>::push_front(T data) // добавляет элемент в начало списка
 {
-    Head = new Node<T>(Data, Head); 
+    Head = new Node<T>(data, Head);
     Size++; 
 }
 
 template <typename T>
-void listContainer<T>::insert(T Data, int index) // добавляет элемент в начало списка
+void listContainer<T>::insert(T data, int index) // добавляет элемент в начало списка
 {
      if (index == 0)
     {
-        push_front(Data);
+        push_front(data);
         return; // интересно так отработает, в 1С без проблем
     }
     else
@@ -155,10 +155,10 @@ void listContainer<T>::insert(T Data, int index) // добавляет элем�
         {
             previous = previous->pNext; 
         }
-        Node<T>* newNode = new Node<T>(Data, previous->pNext);
+        Node<T>* newNode = new Node<T>(data, previous->pNext);
         previous->pNext = newNode;
         // Данный код можно сократить до одной строчки, будет выглядеть так:
-        //previous -> pNext = new Node<T>(Data, previous -> pNext);
+        //previous -> pNext = new Node<T>(data, previous -> pNext);
 
         Node<T>* next = this->Head;
         for (int i = 0; i < index + 1; i++)
