@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef listContainer_H  
-#define listContainer_H  
-
 template<typename T>
 class listContainer
 {
@@ -25,10 +22,10 @@ public:
     listContainer(/* args */);
     ~listContainer();
     void push_back(T value);
-    void Clear();
+    void clear();
     void pop_front();
     int getSize() { return Size; }
-    void remuveAT(int index);
+    void removeAt(int index);
     void insert(T value, int index);
     T& operator [] (const int index);
     void push_front(T Data);
@@ -44,7 +41,7 @@ listContainer<T>::listContainer(/* args */)
 template<typename T>
 listContainer<T>::~listContainer()
 {
-    Clear();
+    clear();
 }
 
 
@@ -59,7 +56,7 @@ void listContainer<T>::pop_front()
 }
 
 template <typename T>
-void listContainer<T>::Clear()
+void listContainer<T>::clear()
 {
     while (Size) { 
         pop_front();
@@ -106,7 +103,7 @@ T& listContainer<T>::operator[](const int index)
 }
 
 template <typename T>
-void listContainer<T>::remuveAT(int index)
+void listContainer<T>::removeAt(int index)
 {
     if (index == 0)
     {
@@ -174,5 +171,3 @@ void listContainer<T>::insert(T Data, int index) // добавляет элем�
     }
 }
 
-
-#endif
