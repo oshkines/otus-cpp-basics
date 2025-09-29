@@ -4,25 +4,31 @@ template<typename T>
 class ConsistentContainer
 {
 private:
-    int Size;
+    int size{};
+    int primarySize{};
      T* data;
 public:
-    ConsistentContainer(/* args */);
+    ConsistentContainer(int size, T* arr);
     ~ConsistentContainer();
     void push_back(T value);
     void clear();
     //void pop_front();
-    int getSize() { return Size; }
+    int getSize() { return size; }
     void removeAt(int index);
     void insert(T value, int index);
     T& operator [] (const int index);
 };
 
 template<typename T>
-ConsistentContainer<T>::ConsistentContainer(/* args */)
+ConsistentContainer<T>::ConsistentContainer(int size, T *arr)
 {
-    Size = 0;
-    data = new T[0];//T data[0];
+    this -> size = size;
+    this -> primarySize = size;
+    data = new T[size];
+    for (int i = 0; i < size; i++)
+    {
+        data[i] = arr[i];
+    }
 }
 
 template<typename T>
@@ -35,46 +41,65 @@ template <typename T>
 void ConsistentContainer<T>::clear()
 {
     delete[] data;
+    size = 0;
+    data = nullptr;
 }
 
 template <typename T>
 void ConsistentContainer<T>::push_back(T value)
 {
-    T* new_Data = new T[Size + 1];
-    for (size_t i = 0; i < Size; ++i) {
-        new_Data[i] = data[i];
+    if (primarySize >= size)
+    {
+        data[size] = value;
     }
-    new_Data[Size] = value;
-    delete[] data;
-    data = new_Data;
-    Size++;
+    else
+    {
+        T* new_Data = new T[size + 1];
+        for (size_t i = 0; i < size; ++i) {
+            new_Data[i] = data[i];
+        }
+        new_Data[size] = value;
+        delete[] data;
+        data = new_Data;
+    }
+    size++;
 }
 
 template <typename T>
 void ConsistentContainer<T>::removeAt(int index)
 {
-    T* new_Data = new T[Size - 1];
+    int deletedElement{};
+    //T* new_Data = new T[size - 1];
     int counter = 0;
-    for (size_t i = 0; i < Size; ++i) {
-        if (i == index)
-        {
+    for (size_t i = 0; i < size; ++i) { 
+        if (i == index) {
+            deletedElement = data[i];
             counter++;
-            continue;
+            data[i] = data[i + counter];
+        }
+        if (i >= index && i != size - 1)
+        {
+            data[i] = data[i + counter];
+             //continue;
+        }
+        else if (i == size - 1)
+        {
+            data[i] = deletedElement;
         }
 
-        new_Data[i - counter] = data[i];
+        //new_Data[i - counter] = data[i];
     }
-    delete[] data;
-    data = new_Data;
-    Size--;
+    //delete[] data;
+    //data = new_Data;
+    size--;
 }
 
 template <typename T>
 void ConsistentContainer<T>::insert(T value, int index)
 {
-    T* new_Data = new T[Size + 1];
+    T* new_Data = new T[size + 1];
     int counter = 0;
-    for (size_t i = 0; i < Size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         if (i == index)
         {
             counter++;
@@ -92,7 +117,7 @@ void ConsistentContainer<T>::insert(T value, int index)
     }
     delete[] data;
     data = new_Data;
-    Size++;
+    size++;
 }
 
 template <typename T>

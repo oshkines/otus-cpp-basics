@@ -4,7 +4,7 @@ template<typename T>
 class listContainer
 {
 private:
-    int Size;
+    int size;
     template<typename T>
     class Node {
     public:
@@ -19,12 +19,12 @@ private:
     };
     Node<T>* Head;
 public:
-    listContainer(/* args */);
+    listContainer(int size, T* arr);
     ~listContainer();
     void push_back(T value);
     void clear();
     void pop_front();
-    int getSize() { return Size; }
+    int getSize() { return size; }
     void removeAt(int index);
     void insert(T value, int index);
     T& operator [] (const int index);
@@ -32,10 +32,14 @@ public:
 };
 
 template<typename T>
-listContainer<T>::listContainer(/* args */)
+listContainer<T>::listContainer(int size, T* arr)
 {
-    Size = 0;
     Head = nullptr;
+    this -> size = 0;
+    for (int i = 0; i < size; i++)
+    {
+        push_back(arr[i]);
+    }
 }
 
 template<typename T>
@@ -52,13 +56,13 @@ void listContainer<T>::pop_front()
     Node<T>* Temp = Head;
     Head = Head->pNext;
     delete Temp;
-    Size--;                       
+    size--;
 }
 
 template <typename T>
 void listContainer<T>::clear()
 {
-    while (Size) { 
+    while (size) {
         pop_front();
     }
 }
@@ -80,7 +84,9 @@ void listContainer<T>::push_back(T data)
         }
         Current->pNext = new Node<T>(data, nullptr, Current);
     }
-    Size++;
+
+     size++;
+
 }
 
 
@@ -128,7 +134,7 @@ void listContainer<T>::removeAt(int index)
         next->pPrev = toDelete->pPrev;
         delete toDelete; 
 
-        Size--;
+        size--;
     }
 }
 
@@ -137,7 +143,7 @@ template <typename T>
 void listContainer<T>::push_front(T data) // добавляет элемент в начало списка
 {
     Head = new Node<T>(data, Head);
-    Size++; 
+    size++;
 }
 
 template <typename T>
@@ -167,7 +173,7 @@ void listContainer<T>::insert(T data, int index) // добавляет элем�
         }
         next->pPrev = newNode;
 
-        Size++;
+        size++;
     }
 }
 
