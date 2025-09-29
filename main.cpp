@@ -68,34 +68,36 @@
 		setlocale(LC_ALL, "Russian");
 
 		cout << "Working with consistent container" << endl;
-		//vector<int> Vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-		ConsistentContainer<int> cc;
-		cc.push_back(0);
-		cc.push_back(1);
-		cc.push_back(2);
-		cc.push_back(3);
-		cc.push_back(4);
-		cc.push_back(5);
-		cc.push_back(6);
-		cc.push_back(7);
-		cc.push_back(8);
-		cc.push_back(9);
+
+		int arr[]{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		int size{10};
+
+		ConsistentContainer<int> cc{ size, arr };
+		//cc.push_back(0);
+		//cc.push_back(1);
+		//cc.push_back(2);
+		//cc.push_back(3);
+		//cc.push_back(4);
+		//cc.push_back(5);
+		//cc.push_back(6);
+		//cc.push_back(7);
+		//cc.push_back(8);
+		//cc.push_back(9);
 		Starting(cc);
 
 		cout << "Working with list container" << endl;
-		//list<int> List{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-		listContainer<int> lc;
-		lc.push_back(0);
-		lc.push_back(1);
-		lc.push_back(2);
-		lc.push_back(3);
-		lc.push_back(4);
-		lc.push_back(5);
-		lc.push_back(6);
-		lc.push_back(7);
-		lc.push_back(8);
-		lc.push_back(9);
+		listContainer<int> lc{ size, arr };
+		//lc.push_back(0);
+		//lc.push_back(1);
+		//lc.push_back(2);
+		//lc.push_back(3);
+		//lc.push_back(4);
+		//lc.push_back(5);
+		//lc.push_back(6);
+		//lc.push_back(7);
+		//lc.push_back(8);
+		//lc.push_back(9);
 
 
 		Starting(lc);
