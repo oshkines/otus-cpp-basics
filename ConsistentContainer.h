@@ -8,7 +8,7 @@ private:
     int primarySize{};
      T* data;
 public:
-    ConsistentContainer(int size, T* arr);
+    ConsistentContainer(int size);
     ~ConsistentContainer();
     void push_back(T value);
     void clear();
@@ -20,15 +20,12 @@ public:
 };
 
 template<typename T>
-ConsistentContainer<T>::ConsistentContainer(int size, T *arr)
+ConsistentContainer<T>::ConsistentContainer(int size)
 {
-    this -> size = size;
+    this -> size = 0;
     this -> primarySize = size;
-    data = new T[size];
-    for (int i = 0; i < size; i++)
-    {
-        data[i] = arr[i];
-    }
+    this -> data = new T[size];
+
 }
 
 template<typename T>
@@ -54,7 +51,9 @@ void ConsistentContainer<T>::push_back(T value)
     }
     else
     {
-        T* new_Data = new T[size + 1];
+        primarySize = 2 * size;
+        T* new_Data = new T[primarySize];
+
         for (size_t i = 0; i < size; ++i) {
             new_Data[i] = data[i];
         }
@@ -77,7 +76,7 @@ void ConsistentContainer<T>::removeAt(int index)
             counter++;
             data[i] = data[i + counter];
         }
-        if (i >= index && i != size - 1)
+        else if (i >= index && i != size - 1)
         {
             data[i] = data[i + counter];
              //continue;
@@ -97,27 +96,59 @@ void ConsistentContainer<T>::removeAt(int index)
 template <typename T>
 void ConsistentContainer<T>::insert(T value, int index)
 {
-    T* new_Data = new T[size + 1];
     int counter = 0;
-    for (size_t i = 0; i < size; ++i) {
-        if (i == index)
-        {
-            counter++;
-            new_Data[i] = value;
-            new_Data[i + counter] = data[i];
+    if (primarySize >= size) {
+        T tmp{};
+        for (size_t i = 0; i < size + 1; ++i) {
+            if (i == index)
+            {
+                //counter++;
+                //tmp = data[i + counter];
+                //data[i + counter] = data[i];
+                //data[i] = value;
+                tmp = data[i];
+                data[i] = value;
+            }
+            else if (i < index)
+            {
+               continue;
+            }
+            else
+            {
+                //T tmp2 = data[i + counter];
+                //data[i + counter] = data[i];
+                //tmp = tmp2;
+                T tmp2 = data[i];
+                data[i] = tmp;
+                tmp = tmp2;
+            }
         }
-        else if (i < index)
-        {
-            new_Data[i] = data[i];
-        }
-        else
-        {
-            new_Data[i + counter] = data[i];
-        }
+
     }
-    delete[] data;
-    data = new_Data;
+    else
+    {
+        T* new_Data = new T[size + 1];
+        for (size_t i = 0; i < size; ++i) {
+            if (i == index)
+            {
+                counter++;
+                new_Data[i] = value;
+                new_Data[i + counter] = data[i];
+            }
+            else if (i < index)
+            {
+                new_Data[i] = data[i];
+            }
+            else
+            {
+                new_Data[i + counter] = data[i];
+            }
+        }
+        delete[] data;
+        data = new_Data;
+    }
     size++;
+
 }
 
 template <typename T>
