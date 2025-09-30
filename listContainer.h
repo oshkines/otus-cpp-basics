@@ -19,7 +19,7 @@ private:
     };
     Node<T>* Head;
 public:
-    listContainer(int size, T* arr);
+    listContainer(int size);
     ~listContainer();
     void push_back(T value);
     void clear();
@@ -32,14 +32,10 @@ public:
 };
 
 template<typename T>
-listContainer<T>::listContainer(int size, T* arr)
+listContainer<T>::listContainer(int size)
 {
     Head = nullptr;
     this -> size = 0;
-    for (int i = 0; i < size; i++)
-    {
-        push_back(arr[i]);
-    }
 }
 
 template<typename T>
