@@ -5,7 +5,7 @@ class listContainer
 {
 private:
     int size;
-    template<typename T>
+
     class Node {
     public:
         Node* pNext;
@@ -17,7 +17,7 @@ private:
             this->pPrev = pPrev;
         };
     };
-    Node<T>* Head;
+    Node* Head;
 public:
     listContainer(int size);
     ~listContainer();
@@ -25,6 +25,7 @@ public:
     void clear();
     void pop_front();
     int getSize() { return size; }
+    bool emptry(){ return size == 0; }   
     void removeAt(int index);
     void insert(T value, int index);
     T& operator [] (const int index);
@@ -49,8 +50,9 @@ template <typename T>
 void listContainer<T>::pop_front()
 {
 
-    Node<T>* Temp = Head;
+    Node* Temp = Head; 
     Head = Head->pNext;
+    if (Head != nullptr) { Head->pPrev = nullptr; }
     delete Temp;
     size--;
 }
@@ -69,28 +71,27 @@ void listContainer<T>::push_back(T data)
 {
      if (Head == nullptr)
     {
-        Head = new Node<T>(data);
+        Head = new Node(data, nullptr, nullptr);
     }
     else
     {
-        Node<T>* Current = this->Head; 
+        Node* Current = this->Head; 
         while (Current->pNext != nullptr)
         {
             Current = Current->pNext;
         }
-        Current->pNext = new Node<T>(data, nullptr, Current);
+        Current->pNext = new Node(data, nullptr, Current);
     }
 
      size++;
 
 }
 
-
 template <typename T>
 T& listContainer<T>::operator[](const int index)
 {
     int counter = 0; 
-    Node<T>* Current = this->Head; 
+    Node* Current = Head; 
 
     while (Current != nullptr) {
         if (counter == index)
@@ -101,33 +102,51 @@ T& listContainer<T>::operator[](const int index)
         Current = Current->pNext;
         counter++;
     }
-
+    return Head->data;
 }
 
 template <typename T>
-void listContainer<T>::removeAt(int index)
+void listContainer<T>::removeAt(const int index)
 {
-    if (index == 0)
+    int counter = 0;
+    Node* toDelete = Head;
+
+    while (toDelete != nullptr) {
+        if (counter == index)
+        {
+            break;
+        }
+        toDelete = toDelete->pNext;
+        counter++;
+    }
+
+
+
+    if (toDelete->pPrev == nullptr)//(index == 0)
     {
         pop_front();
     }
     else
     {
-        Node<T>* previous = this->Head;
-        for (int i = 0; i < index - 1; i++)
-        {
-            previous = previous->pNext; 
-        }
+        //Node* previous = this->Head;
+        //for (int i = 0; i < index - 1; i++)
+        //{
+        //    previous = previous->pNext; 
+        //}
 
-        Node<T>* next = this->Head;
-        for (int i = 0; i < index+1; i++)
-        {
-            next = next->pNext;
-        }
+        //Node* next = this->Head;
+        //for (int i = 0; i < index+1; i++)
+        //{
+        //    next = next->pNext;
+        //}
 
-        Node<T>* toDelete = previous->pNext; 
-        previous->pNext = toDelete->pNext;  
-        next->pPrev = toDelete->pPrev;
+        Node* previous = toDelete->pPrev;
+        Node* next = toDelete ->pNext;
+
+        //Node* toDelete = previous->pNext; 
+        if (previous != nullptr){ previous->pNext = toDelete->pNext; }
+        if (next != nullptr) { next->pPrev = toDelete->pPrev; }
+
         delete toDelete; 
 
         size--;
@@ -138,7 +157,7 @@ void listContainer<T>::removeAt(int index)
 template <typename T>
 void listContainer<T>::push_front(T data) // добавляет элемент в начало списка
 {
-    Head = new Node<T>(data, Head);
+    Head = new Node(data, Head);
     size++;
 }
 
@@ -147,29 +166,37 @@ void listContainer<T>::insert(T data, int index) // добавляет элем�
 {
      if (index == 0)
     {
+        Node* next = this->Head;
         push_front(data);
+        if (size > 1) { next->pPrev = Head; }
         return; // интересно так отработает, в 1С без проблем
     }
     else
     {
-        Node<T>* previous = this->Head;  
-        for (int i = 0; i < index - 1; i++)
+         //this[0]
+        Node* previous = this->Head;  
+        for (int i = 0; i < index - 1; ++i)
         {
             previous = previous->pNext; 
         }
-        Node<T>* newNode = new Node<T>(data, previous->pNext);
-        previous->pNext = newNode;
+
         // Данный код можно сократить до одной строчки, будет выглядеть так:
         //previous -> pNext = new Node<T>(data, previous -> pNext);
+        Node* next = this->Head;
+        if (size > index) {
+            //Node* next = this->Head;
+            for (int i = 0; i < index; i++)
+            {
+                next = next->pNext;
+            }
 
-        Node<T>* next = this->Head;
-        for (int i = 0; i < index + 1; i++)
-        {
-            next = next->pNext;
         }
+
+        Node* newNode = new Node(data, next, previous);//new Node(data, previous->pNext);
+        previous->pNext = newNode;
         next->pPrev = newNode;
+        //newNode->pNext = next;
 
         size++;
     }
 }
-

@@ -14,32 +14,40 @@ public:
     void clear();
     //void pop_front();
     int getSize() { return size; }
+    bool emptry(){ return size == 0; }    
     void removeAt(int index);
     void insert(T value, int index);
     T& operator [] (const int index);
+    void push_front(T data);
 };
 
 template<typename T>
 ConsistentContainer<T>::ConsistentContainer(int size)
 {
     this -> size = 0;
-    this -> primarySize = size;
-    this -> data = new T[size];
-
+    this -> primarySize = size * 1.4;
+    //T* data = new T[primarySize];
+    this -> data = new T[primarySize];
+    for (size_t i = 0; i < primarySize; ++i) {
+        data[i] = 0;
+    }
 }
 
 template<typename T>
 ConsistentContainer<T>::~ConsistentContainer()
 {
-    clear();
+    if (size != 0) { delete[] data; }
+    size = 0;
+    data = nullptr;
 }
 
 template <typename T>
 void ConsistentContainer<T>::clear()
 {
-    delete[] data;
+    for (size_t i = 0; i < size; ++i) {
+        data[i] = 0;
+    }
     size = 0;
-    data = nullptr;
 }
 
 template <typename T>
@@ -51,7 +59,7 @@ void ConsistentContainer<T>::push_back(T value)
     }
     else
     {
-        primarySize = 2 * size;
+        primarySize = size*1.4;
         T* new_Data = new T[primarySize];
 
         for (size_t i = 0; i < size; ++i) {
@@ -61,6 +69,31 @@ void ConsistentContainer<T>::push_back(T value)
         delete[] data;
         data = new_Data;
     }
+    size++;
+}
+
+template<typename T>
+void ConsistentContainer<T>::push_front(T value)
+{
+    if (primarySize <= size)
+    {
+        primarySize = size * 1.4;
+        T* new_Data = new T[primarySize];
+
+        for (size_t i = 0; i < size; ++i) {
+            new_Data[i] = data[i];
+        }
+        delete[] data;
+        data = new_Data;
+    }
+    T tmp{ value };
+    T tmp1{};
+    for (size_t i = 0; i < size + 1; ++i) {
+        tmp1 = data[i];
+        data[i] = tmp;
+        tmp = tmp1;
+     }
+    
     size++;
 }
 
@@ -97,19 +130,37 @@ template <typename T>
 void ConsistentContainer<T>::insert(T value, int index)
 {
     int counter = 0;
-    if (primarySize >= size) {
-        T tmp{};
+    T tmp{ value };
+
+    if (primarySize <= size)
+    {
+        primarySize = size * 1.4;
+        T* new_Data = new T[primarySize];
+
+        for (size_t i = 0; i < size; ++i) {
+            new_Data[i] = data[i];
+        }
+        delete[] data;
+        data = new_Data;
+    }
+
+    if (index == 0) {
+        push_front(value);
+    }
+    else{ //if (primarySize >= size) {
+        //T tmp{};
         for (size_t i = 0; i < size + 1; ++i) {
-            if (i == index)
-            {
-                //counter++;
-                //tmp = data[i + counter];
-                //data[i + counter] = data[i];
-                //data[i] = value;
-                tmp = data[i];
-                data[i] = value;
-            }
-            else if (i < index)
+            //if (i == index)
+            //{
+            //    //counter++;
+            //    //tmp = data[i + counter];
+            //    //data[i + counter] = data[i];
+            //    //data[i] = value;
+            //    tmp = data[i];
+            //    data[i] = value;
+            //}
+            //else 
+            if (i < index)
             {
                continue;
             }
@@ -123,9 +174,9 @@ void ConsistentContainer<T>::insert(T value, int index)
                 tmp = tmp2;
             }
         }
-
+        size++;
     }
-    else
+    /*else
     {
         T* new_Data = new T[size + 1];
         for (size_t i = 0; i < size; ++i) {
@@ -146,8 +197,8 @@ void ConsistentContainer<T>::insert(T value, int index)
         }
         delete[] data;
         data = new_Data;
-    }
-    size++;
+    }*/
+    //size++;
 
 }
 
