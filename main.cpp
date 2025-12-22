@@ -1,106 +1,134 @@
+#include "readSQL.hpp"
+#include "updataSQL.hpp"
+#include "deleteSQL.hpp"
+#include <iostream>
+#include <map>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
-	#include <iostream>
-	#include "ConsistentContainer.h"
-	#include "listContainer.h"
+int main() {
+    // Устанавливаем кодировку консоли
+    #ifdef _WIN32
+    SetConsoleOutputCP(1251);
+    SetConsoleCP(1251);
+    #endif
 
-	using namespace std;
+    int colRecords;
+    std::cout << "Enter the number of records requested from the customer table:" << std::endl;
+    std::cin >> colRecords;
 
-	template <typename Container>
-	void Send_message(Container& container) {
-		for (int i = 0; i < container.getSize(); ++i)
-		{
-			cout << container[i];// << ", ";
-			if (i+1 != container.getSize()) {
-				cout << ", ";
-			}
-		}
-		cout << endl << "size: " << container.getSize() << endl << endl;
-	}
+    std::string code = "";
 
-	template <typename Container>
-	void deleteElements(Container& container) {
+    std::vector<Record> records = readSql(colRecords, code);
 
-		int ArrDelete[] = { 3, 5, 7 };
-		int counter = 0;
+    // Можно дальше работать с полученными записями
+    std::cout << "\nRecords returned from the function: " << records.size() << std::endl;
 
-		for (int j = 2; j >= 0; j--)
-		{
-			container.removeAt(ArrDelete[j] - 1);
-		}
-	} 
+    if (records.size() == 0)
+    {
+        return 0;
+    }
+    bool thereAreChanges = false;
+        std::cout << "Select the following operation with the SQL database:" << std::endl;
+        std::cout << "1. change the record." << std::endl;
+        std::cout << "2. delete the record." << std::endl;
+        std::cout << "3. exit." << std::endl;
 
-	template <typename Container>
-	void addElements(Container& container) {
+        int entryNumber;
+        std::cin >> entryNumber;
 
-		cout << "Add elements to the collection" << endl;
+        if (entryNumber == 1)
+        {
+            std::map<std::string, std::string> fields;
+            std::cout << "Enter the client record code:" << std::endl;
+            std::cin >> code;
+            records = readSql(colRecords, code);
+            int option;
+            for (const auto& record : records) {
+                std::cin.ignore();
+                std::cout << "Do you want to change the client name? Yes = 1 No = any character:" << std::endl;
+                std::cin >> option;
+                if (option == 1)
+                {
+                    std::cout << "Enter new name:" << std::endl;
+                    std::cin.ignore();
+                    std::getline(std::cin, fields["_description"]);
+                    thereAreChanges = true;
+                }
 
-		container.insert(10, 0);
-		Send_message(container);
+                std::cout << "You want to invert the client field (boolean)? Yes = 1 No = any character:" << std::endl;
+                std::cin >> option;
+                if (option == 1)
+                {
+                    if (record.isKlient == "Yes") {
+                        fields["_fld55051"] = "No";
+                    }
+                    else {
+                        fields["_fld55051"] = "Yes";
+                    }
+                    thereAreChanges = true;
+                }
 
-		int place = container.getSize() / 2;
-		container.insert(20, place);
+                std::cout << "You want to invert the postavshik field (boolean)? Yes = 1 No = any character:" << std::endl;
+                std::cin >> option;
+                if (option == 1)
+                {
+                    if (record.isPostavshik == "Yes") {
+                        fields["_fld55053"] = "No";
+                    }
+                    else {
+                        fields["_fld55053"] = "Yes";
+                    }
+                    thereAreChanges = true;
+                }
 
-		Send_message(container);
+                //std::cout << "Do you want to change the client kontact information? Yes = 1 No = any character:" << std::endl;
+                //std::cin >> option;
+                //if (option == 1)
+                //{
+                //    std::cout << "Enter new kontact information:" << std::endl;
+                //    std::cin.ignore();
+                //    std::getline(std::cin, fields["kontactinformation"]);
+                //    thereAreChanges = true;
+                //}
 
-		container.push_back(30);
-		Send_message(container);
-	}
+                std::cout << "Do you want to change the client birthdate (`1978-02-08`)? Yes = 1 No = any character:" << std::endl;
+                std::cin >> option;
+                if (option == 1)
+                {
+                    std::cout << "Enter new date of birth:" << std::endl;
+                    std::cin.ignore();
+                    std::getline(std::cin, fields["_fld55064"]);
+                    thereAreChanges = true;
+                }
 
-	template <typename Container>
-	void Starting(Container& container)
-	{
+                if (thereAreChanges)
+                {
+                    bool result = updataSql(code, fields);
 
-		cout << "We output the contents of the array to the console" << endl;
-		Send_message(container);
+                    if (result) {
+                        records = readSql(colRecords, code);
+                    }
+                    break;
+                }
+            }
+        }
+        else if (entryNumber == 2)
+        {
+            std::cout << "Enter the client delete code:" << std::endl;
+            std::cin >> code;
 
-		cout << "Delete Elements from container" << endl;
-		deleteElements(container);
+            bool result = deleteSql(code);
 
-		Send_message(container);
-
-		addElements(container);
-
-	}
-
-	int main()
-	{
-
-		setlocale(LC_ALL, "Russian");
-
-		cout << "Working with consistent container" << endl;
-
-		//int arr[]{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-		int size{10};
-
-		ConsistentContainer<int> cc{ size };
-		cc.push_back(0);
-		cc.push_back(1);
-		cc.push_back(2);
-		cc.push_back(3);
-		cc.push_back(4);
-		cc.push_back(5);
-		cc.push_back(6);
-		cc.push_back(7);
-		cc.push_back(8);
-		cc.push_back(9);
-		Starting(cc);
-
-		cout << "Working with list container" << endl;
-
-		listContainer<int> lc{ size };
-		lc.push_back(0);
-		lc.push_back(1);
-		lc.push_back(2);
-		lc.push_back(3);
-		lc.push_back(4);
-		lc.push_back(5);
-		lc.push_back(6);
-		lc.push_back(7);
-		lc.push_back(8);
-		lc.push_back(9);
-
-
-		Starting(lc);
-
-		return 0;
-	}
+            if (result) 
+            {
+                std::vector<Record> records = readSql(colRecords, "");
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    return 0;
+}
