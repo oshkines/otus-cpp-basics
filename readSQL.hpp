@@ -1,15 +1,9 @@
 #pragma once
 #include <string>
-#include <vector>
+#include <pqxx/pqxx>
+#include "common.hpp"  
+#include "connectionmanager.hpp"
 
-struct Record {
-    std::string code;
-    std::string name;
-    std::string isKlient;
-    std::string isPostavshik;
-    std::string birthdate;
-    std::string typeKI;
-    std::string kontactInformation;
-};
+//class ConnectionManager;
 
-std::vector<Record> readSql(int colRecords, std::string code);
+pqxx::result readSql(ConnectionManager& dbManager, int colRecords, std::string code = "");
