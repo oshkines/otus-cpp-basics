@@ -12,8 +12,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Ищем libpqxx через CONFIG mode
 find_package(libpqxx CONFIG REQUIRED)
 
+set(SOURCES
+    main.cpp
+    readSQL.cpp
+    consoleOutput.cpp
+    deleteSQL.cpp
+    updataSQL.cpp
+    utils.cpp
+    dbconfig.cpp         
+    connectionmanager.cpp
+)
+
+# Список заголовочных файлов
+set(HEADERS
+    common.hpp
+    readSQL.hpp
+    consoleOutput.hpp
+    deleteSQL.hpp
+    updataSQL.hpp
+    utils.hpp
+    dbconfig.hpp         
+    connectionmanager.hpp
+)
 # Создаем исполняемый файл
-add_executable(${PROJECT_NAME} main.cpp "readSQL.cpp" "updataSQL.cpp" "deleteSQL.cpp")
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 # Линкуем библиотеку
 target_link_libraries(${PROJECT_NAME} PRIVATE 

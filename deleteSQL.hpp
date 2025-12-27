@@ -1,4 +1,7 @@
 #pragma once
 #include <string>
+#include "connectionmanager.hpp"
 
-bool deleteSql(std::string code);
+//class ConnectionManager;
+
+bool deleteSql(ConnectionManager& dbManager, std::string code);
