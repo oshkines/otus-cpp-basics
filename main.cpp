@@ -1,232 +1,194 @@
-#include "common.hpp"
-#include "readSQL.hpp"
-#include "updataSQL.hpp"
-#include "deleteSQL.hpp"
-#include "consoleOutput.hpp"
-#include "connectionmanager.hpp"
+#include <algorithm>
 #include <iostream>
-#include <map>
 #include <limits>
-#include <string>  // Добавляем
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include <vector>
+#include <thread>
+#include <atomic>
 
-int main(int argc, char* argv[])
-{
-#ifdef _WIN32
-    SetConsoleOutputCP(1251);
-    SetConsoleCP(1251);
-#endif
+#include "CRC32.hpp"
+#include "IO.hpp"
 
-    // Создаем менеджер подключений
-    ConnectionManager dbManager;
+/// @brief Переписывает последние 4 байта значением value
+void replaceLastFourBytes(std::vector<char> &data, uint32_t value) {
+  std::copy_n(reinterpret_cast<const char *>(&value), 4, data.end() - 4);
+}
 
-    // Инициализация менеджера подключений
-    std::cout << "Initializing database connection..." << std::endl;
-    if (!dbManager.initialize("database.conf")) {
-        std::cout << "Failed to initialize database connection." << std::endl;
-        std::cout << "Please check your configuration file or edit settings." << std::endl;
+//TODO
+struct ThreadData {
+    const std::vector<char>* original;    // Указатель на оригинальные данные
+    std::vector<char>* result;            // Указатель на результат (изменяется только последние 4 байта)
+    const std::string* injection;         // Строка для вставки
+    uint32_t start;                       // Начало диапазона перебора
+    uint32_t end;                         // Конец диапазона перебора (не включая)
+    uint32_t originalCrc32;               // Целевой CRC32
+    std::atomic<bool>* found;             // Флаг нахождения решения
+    std::atomic<uint32_t>* solution;      // Найденное значение
+    std::atomic<uint32_t>* progressCounter; // Счетчик прогресса
+};
 
-        // Предлагаем редактировать настройки
-        char choice;
-        std::cout << "Edit database settings now? (y/n): ";
-        std::cin >> choice;
-
-        if (choice == 'y' || choice == 'Y') {
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            dbManager.editConfig();
-
-            // Пытаемся снова
-            if (!dbManager.testConnection()) {
-                std::cout << "Still cannot connect. Exiting." << std::endl;
-                return 1;
-            }
+void threadWorker(ThreadData data) {
+    // Создаем локальную копию данных для этого потока
+    std::vector<char> localResult = *data.result;
+    
+    // Перебираем свой диапазон значений
+    for (uint32_t i = data.start; i < data.end && !data.found->load(); ++i) {
+        replaceLastFourBytes(localResult, i);
+        uint32_t currentCrc32 = crc32(localResult.data(), localResult.size());
+        
+        if (currentCrc32 == data.originalCrc32) {
+            // Сохраняем найденное решение
+            data.solution->store(i);
+            data.found->store(true);
+            return;
         }
-        else {
-            return 1;
-        }
-    }
-
-    std::cout << "Database connection established successfully!" << std::endl;
-
-    int colRecords;
-
-    std::cout << "Enter the number of records requested from the customer table:" << std::endl;
-    while (true)
-    {
-        std::cin >> colRecords;
-        if (std::cin.fail()) {
-            std::cout << "Error! Please enter a valid number: ";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
-        else {
-            break;
+        
+        // Обновляем прогресс каждые 1000 итераций
+        if ((i - data.start) % 1000 == 0) {
+            (*data.progressCounter) += 1000;
         }
     }
+}
+//FIXME
 
-    std::string code = "";
-    pqxx::result R = readSql(dbManager, colRecords, code);  // Передаем dbManager
-    std::vector<Record> records = OutputConsole(R, colRecords);
+/**
+ * @brief Формирует новый вектор с тем же CRC32, добавляя в конец оригинального
+ * строку injection и дополнительные 4 байта
+ * @details При формировании нового вектора последние 4 байта не несут полезной
+ * нагрузки и подбираются таким образом, чтобы CRC32 нового и оригинального
+ * вектора совпадали
+ * @param original оригинальный вектор
+ * @param injection произвольная строка, которая будет добавлена после данных
+ * оригинального вектора
+ * @return новый вектор
+ */
+//TODO
+// std::vector<char> hack(const std::vector<char> &original,
+//                        const std::string &injection) {
+//   const uint32_t originalCrc32 = crc32(original.data(), original.size());
 
-    std::cout << "\nRecords returned from the function: " << records.size() << std::endl;
+//   std::vector<char> result(original.size() + injection.size() + 4);
+//   auto it = std::copy(original.begin(), original.end(), result.begin());
+//   std::copy(injection.begin(), injection.end(), it);
 
-    if (records.size() == 0)
-    {
-        return 0;
+//   /*
+//    * Внимание: код ниже крайне не оптимален.
+//    * В качестве доп. задания устраните избыточные вычисления
+//    */
+//   const size_t maxVal = std::numeric_limits<uint32_t>::max();
+//   for (size_t i = 0; i < maxVal; ++i) {
+//     // Заменяем последние четыре байта на значение i
+//     replaceLastFourBytes(result, uint32_t(i));
+//     // Вычисляем CRC32 текущего вектора result
+//     auto currentCrc32 = crc32(result.data(), result.size());
+
+//     if (currentCrc32 == originalCrc32) {
+//       std::cout << "Success\n";
+//       return result;
+//     }
+//     // Отображаем прогресс
+//     if (i % 1000 == 0) {
+//       std::cout << "progress: "
+//                 << static_cast<double>(i) / static_cast<double>(maxVal)
+//                 << std::endl;
+//     }
+//   }
+//   throw std::logic_error("Can't hack");
+// }
+
+std::vector<char> hack(const std::vector<char> &original,
+                       const std::string &injection) {
+    const uint32_t originalCrc32 = crc32(original.data(), original.size());
+    
+    // Создаем результат: оригинал + строка + 4 байта
+    std::vector<char> result(original.size() + injection.size() + 4);
+    auto it = std::copy(original.begin(), original.end(), result.begin());
+    std::copy(injection.begin(), injection.end(), it);
+    
+    // Количество потоков
+    unsigned int numThreads = std::thread::hardware_concurrency();
+    if (numThreads == 0) {
+        numThreads = 4; // fallback
     }
-
-    while (true)
-    {
-        bool thereAreChanges = false;
-        std::cout << "\nSelect the following operation with the SQL database:" << std::endl;
-        std::cout << "1. Change the record." << std::endl;
-        std::cout << "2. Delete the record." << std::endl;
-        std::cout << "3. Database Settings." << std::endl;
-        std::cout << "4. Exit." << std::endl;
-
-        int entryNumber;
-        while (true)
-        {
-            std::cin >> entryNumber;
-            if (std::cin.fail())
-            {
-                std::cout << "Error! Please enter a number between 1 and 4: ";
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            }
-            else
-            {
-                if (entryNumber >= 1 && entryNumber <= 4)
-                {
-                    break;
-                }
-            }
-        }
-
-        if (entryNumber == 1)
-        {
-            std::map<std::string, std::string> fields;
-            std::cout << "Enter the client record code:" << std::endl;
-            std::cin >> code;
-
-            R = readSql(dbManager, colRecords, code);  // Передаем dbManager
-            records = OutputConsole(R, colRecords);
-
-            int option;
-            for (const auto& record : records)
-            {
-                std::cin.ignore();
-                std::cout << "Do you want to change the client name? Yes = 1 No = any character:" << std::endl;
-                std::cin >> option;
-                if (option == 1)
-                {
-                    std::cout << "Enter new name:" << std::endl;
-                    std::cin.ignore();
-                    std::getline(std::cin, fields["_description"]);
-                    thereAreChanges = true;
-                }
-
-                std::cout << "You want to invert the client field (boolean)? Yes = 1 No = any character:" << std::endl;
-                std::cin >> option;
-                if (option == 1)
-                {
-                    fields["_fld55051"] = record.isKlient ? "false" : "true";
-                    thereAreChanges = true;
-                }
-
-                std::cout << "You want to invert the postavshik field (boolean)? Yes = 1 No = any character:" << std::endl;
-                std::cin >> option;
-                if (option == 1)
-                {
-                    fields["_fld55053"] = record.isPostavshik ? "false" : "true";
-                    thereAreChanges = true;
-                }
-
-                std::cout << "Do you want to change the client birthdate (`1978-02-08`)? Yes = 1 No = any character:" << std::endl;
-                std::cin >> option;
-                if (option == 1)
-                {
-                    std::cout << "Enter new date of birth:" << std::endl;
-                    std::cin.ignore();
-                    std::getline(std::cin, fields["_fld55064"]);
-                    thereAreChanges = true;
-                }
-
-                if (thereAreChanges)
-                {
-                    bool result = updataSql(dbManager, code, fields);  // Передаем dbManager
-
-                    if (result) {
-                        R = readSql(dbManager, colRecords, code);  // Передаем dbManager
-                        records = OutputConsole(R, colRecords);
-                    }
-                    break;
-                }
-            }
-        }
-        else if (entryNumber == 2)
-        {
-            std::cout << "Enter the client delete code:" << std::endl;
-            std::cin >> code;
-
-            bool result = deleteSql(dbManager, code);  // Передаем dbManager
-
-            if (result)
-            {
-                R = readSql(dbManager, colRecords, "");  // Передаем dbManager
-                records = OutputConsole(R, colRecords);
-            }
-        }
-        else if (entryNumber == 3)
-        {
-            // Меню настроек базы данных
-            std::cout << "\n=== Database Settings ===" << std::endl;
-            std::cout << "1. Edit connection settings" << std::endl;
-            std::cout << "2. Test connection" << std::endl;
-            std::cout << "3. Show current settings" << std::endl;
-            std::cout << "4. Back to main menu" << std::endl;
-
-            int settingsChoice;
-            std::cin >> settingsChoice;
-
-            switch (settingsChoice) {
-            case 1:
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                dbManager.editConfig();
-                break;
-            case 2:
-                if (dbManager.testConnection()) {
-                    std::cout << "Connection test: SUCCESS" << std::endl;
-                }
-                else {
-                    std::cout << "Connection test: FAILED" << std::endl;
-                }
-                break;
-            case 3: {
-                const auto& config = dbManager.getConfig();
-                std::cout << "\nCurrent settings:" << std::endl;
-                std::cout << "Host: " << config.host << std::endl;
-                std::cout << "Port: " << config.port << std::endl;
-                std::cout << "Database: " << config.dbname << std::endl;
-                std::cout << "User: " << config.user << std::endl;
-                std::cout << "Password: " << std::string(config.password.length(), '*') << std::endl;
-                std::cout << "Charset: " << config.charset << std::endl;
-                std::cout << "Timezone: " << config.timezone << std::endl;
-                break;
-            }
-            case 4:
-                break;
-            default:
-                std::cout << "Invalid choice." << std::endl;
-            }
-        }
-        else
-        {
-            return 0;
-        }
+    
+    // Диапазон значений для перебора
+    const uint64_t maxVal = std::numeric_limits<uint32_t>::max();
+    const uint64_t rangeSize = maxVal / numThreads;
+    
+    // Атомарные переменные для синхронизации
+    std::atomic<bool> found(false);           //флаг нахождения решения
+    std::atomic<uint32_t> solution(0);        //найденное значение
+    std::atomic<uint32_t> progressCounter(0); //счетчик прогресса
+    
+    // Вектор потоков и данных для них
+    std::vector<std::thread> threads;
+    std::vector<ThreadData> threadData(numThreads);
+    
+    // Создаем потоки
+    //Каждый поток работает с локальной копией вектора result
+    for (unsigned int i = 0; i < numThreads; ++i) {
+        threadData[i].original = &original;
+        threadData[i].result = &result;
+        threadData[i].injection = &injection;
+        threadData[i].originalCrc32 = originalCrc32;
+        threadData[i].found = &found;
+        threadData[i].solution = &solution;
+        threadData[i].progressCounter = &progressCounter;
+        
+        // Распределяем диапазоны
+        threadData[i].start = static_cast<uint32_t>(i * rangeSize);
+        threadData[i].end = (i == numThreads - 1) 
+                          ? static_cast<uint32_t>(maxVal) + 1  // Включая последнее значение
+                          : static_cast<uint32_t>((i + 1) * rangeSize);
+        
+        threads.emplace_back(threadWorker, threadData[i]);
     }
+    
+    // Поток для отображения прогресса
+    std::thread progressThread([&found, &progressCounter, maxVal]() {
+        while (!found.load()) {
+            uint32_t currentProgress = progressCounter.load();
+            std::cout << "progress: "
+                      << static_cast<double>(currentProgress) / static_cast<double>(maxVal)
+                      << std::endl;
+            
+            // Ждем немного перед следующим обновлением
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    });
+    
+    // Ждем завершения рабочих потоков
+    for (auto& thread : threads) {
+        thread.join();
+    }
+    
+    // Ждем завершения потока прогресса
+    progressThread.join();
+    
+    if (found.load()) {
+        std::cout << "Success! Found value: " << solution.load() << std::endl;
+        replaceLastFourBytes(result, solution.load());
+        return result;
+    }
+    
+    throw std::logic_error("Can't hack");
+}
 
-    return 0;
+//FIXME
+
+int main(int argc, char **argv) {
+  if (argc != 3) {
+    std::cerr << "Call with two args: " << argv[0]
+              << " <input file> <output file>\n";
+    return 1;
+  }
+
+  try {
+    const std::vector<char> data = readFromFile(argv[1]);
+    const std::vector<char> badData = hack(data, "He-he-he");
+    writeToFile(argv[2], badData);
+  } catch (std::exception &ex) {
+    std::cerr << ex.what() << '\n';
+    return 2;
+  }
+  return 0;
 }
